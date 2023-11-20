@@ -46,15 +46,15 @@ app.post('/register', async (request, response) => {
 
     let passLen = password.length
     if (passLen < 5) {
-      response.status = 400
+      response.status(400)
       response.send('Password is too short')
     } else {
       const dbRes = await db.run(queryReg)
-      response.status = 200
+      response.status(400)
       response.send('User created successfully')
     }
   } else {
-    response.status = 400
+    response.status(400)
     response.send('User already exists')
   }
 })
@@ -64,17 +64,17 @@ app.post('/login', async (request, response) => {
   const userCheck = ` select * from user where username='${username}';`
   const query2 = await db.get(userCheck)
   if (query2 === undefined) {
-    response.status = 400
+    response.status(400)
     response.send('Invalid user')
   } else {
     let hased = query2.password
     const isPass = await bcrypt.compare(password, hased)
 
     if (isPass) {
-      response.status = 200
+      response.status(200)
       response.send('Login success!')
     } else {
-      response.status = 400
+      response.status(400)
       response.send('Invalid password')
     }
   }
@@ -85,7 +85,7 @@ app.put('/change-password', async (request, response) => {
   const usercheck2 = ` select * from user where username='${username}';`
   const query3 = await db.get(usercheck2)
   if (query3 === undefined) {
-    response.status = 400
+    response.status(400)
     response.send('Invalid User')
   } else {
     const oldpass = query3.password
@@ -94,19 +94,20 @@ app.put('/change-password', async (request, response) => {
 
     if (isPass) {
       if (newPassword.length < 5) {
-        response.status = 400
+        response.status(400)
         response.send('Password is too short')
       } else {
         const newHased = await bcrypt.hash(newPassword, 10)
         const updatePass = `update user set password='${newHased}' where username='${username}'; `
         const updateRes = await db.run(updatePass)
-        response.status = 200
+        response.status(200)
         response.send('Password updated')
       }
     } else {
-      response.status = 400
+      response.status(400)
       response.send('Invalid current password')
     }
   }
 })
 module.exports = app
+
